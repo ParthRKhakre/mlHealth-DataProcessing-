@@ -1,0 +1,56 @@
+# ---------------------------------------------------------------
+# Dataset configuration
+# ---------------------------------------------------------------
+# To use a different Kaggle dataset, change "slug" (the part of the
+# Kaggle URL after kaggle.com/datasets/) and, if needed,
+# "subject_regex" so the script knows how to find the patient ID
+# inside each file path.
+#
+# subject_regex: a regular expression applied to every file path
+#   inside the zip. The FIRST capture group (...) is the subject /
+#   patient ID. Files that do not match are ignored.
+#   Leave it empty ("") to treat every image as its own subject.
+#
+# slice_regex (optional): which files count as "slices" in the
+#   metadata CSV (e.g. skip masks or extra windows). Default: all images.
+#
+# exclude_regex (optional): zip paths to ignore completely
+#   (e.g. a duplicate copy of the data inside the zip).
+# ---------------------------------------------------------------
+
+defaults:
+  n_subjects: 10          # how many subjects to extract per dataset
+  seed: null              # null = take the first N (sorted); a number = random pick with that seed
+  download_retries: 3     # how many times to retry a failed download
+
+datasets:
+  - name: brain_ct
+    slug: vbookshelf/computed-tomography-ct-images
+    folder: brain_ct
+    modality: CT
+    # e.g. ".../Patients_CT/049/brain/12.jpg"  or  ".../ct_scans/049.nii"  -> "049"
+    subject_regex: '(?:Patients_CT/|ct_scans/|masks/)(\d+)'
+    # each patient has brain/N.jpg, bone/N.jpg (same slice, other window)
+    # and brain/N_HGE_Seg.jpg (hemorrhage mask) -> count only brain/N.jpg
+    slice_regex: '/brain/\d+\.jpg$'
+
+  - name: chest_ct
+    slug: maedemaftouni/covid19-ct-scan-lesion-segmentation-dataset
+    folder: chest_ct
+    modality: CT
+    # e.g. "frames/Jun_coronacases_case10_100.png" -> "Jun_coronacases_case10"
+    subject_regex: '(?:frames|masks)/(.+)_\d+\.png$'
+    slice_regex: 'frames/'    # masks/ are labels, not slices
+
+  - name: chest_xray
+    slug: paultimothymooney/chest-xray-pneumonia
+    folder: chest_xray
+    modality: XRAY
+    # e.g. "person1_bacteria_1.jpeg" -> "person1"
+    #      "IM-0115-0001.jpeg"       -> "IM-0115"
+    #      "NORMAL2-IM-1427-0001.jpeg" -> "NORMAL2-IM-1427"
+    # NOTE: sorted IDs put all NORMAL ("IM-...") patients first; use --seed
+    #       to get a random mix of NORMAL and PNEUMONIA patients.
+    subject_regex: '/((?:NORMAL2-)?IM-\d+|person\d+)[-_][^/]*\.jpe?g$'
+    # the zip holds a second, identical copy under chest_xray/chest_xray/ - skip it
+    exclude_regex: '^chest_xray/chest_xray/'

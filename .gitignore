@@ -1,0 +1,11 @@
+# Secret API key - never commit or share this
+kaggle.json
+access_token
+
+# Large downloaded data
+*.zip
+*.kaggle-partial
+*/subset_*/
+
+logs/
+__pycache__/
