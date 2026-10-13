@@ -64,17 +64,18 @@ If the zips are already downloaded, they are not downloaded again.
 
 ```bash
 python scripts/run_all.py --n 5                  # 5 subjects per dataset
-python scripts/run_all.py --n 10 --seed 42       # random (but repeatable) 10 subjects
+python scripts/run_all.py --n 10 --seed 7        # random (but repeatable) pick for ALL datasets
 python scripts/run_all.py --skip-download        # use zips already on disk
 
 python scripts/extract_subset.py --only chest_ct --inspect   # just show what is inside a zip
 python scripts/verify.py --n 10                               # re-check the extracted files
 ```
 
-By default the **first** N subjects are taken, sorted by ID. Add `--seed <number>`
-to take a random sample instead. The same seed always gives the same subjects.
-For the X-rays, sorted IDs put all NORMAL patients (`IM-...`) before PNEUMONIA
-patients (`person...`), so use `--seed` if you want both classes.
+By default the **first** N subjects are taken, sorted by ID. The exception is
+chest_xray, which has `seed: 42` in `config.yaml`. Sorted IDs put all NORMAL
+patients (`IM-...`) before PNEUMONIA patients (`person...`), so a random but
+repeatable pick gives both classes. The same seed always gives the same subjects.
+`--seed <number>` on the command line overrides the seed for every dataset.
 
 ## Changing the datasets
 

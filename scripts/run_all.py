@@ -11,7 +11,7 @@ import argparse
 
 from download import download_dataset
 from extract_subset import extract_subset
-from utils import PROJECT_DIR, has_kaggle_credentials, load_config, setup_logging
+from utils import PROJECT_DIR, has_kaggle_credentials, load_config, pick_seed, setup_logging
 from verify import verify_dataset
 
 log = setup_logging()
@@ -36,8 +36,8 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--n", type=int, default=cfg["defaults"]["n_subjects"],
                         help="subjects per dataset (default 10)")
-    parser.add_argument("--seed", type=int, default=cfg["defaults"].get("seed"),
-                        help="random seed for choosing subjects (default: first N)")
+    parser.add_argument("--seed", type=int, default=None,
+                        help="random seed for all datasets (overrides config.yaml)")
     parser.add_argument("--skip-download", action="store_true",
                         help="use zips that are already on disk")
     args = parser.parse_args()
@@ -57,7 +57,7 @@ def main():
                                     cfg["defaults"].get("download_retries", 3)) is None:
                     results.append({"dataset": name, "error": "download failed"})
                     continue
-            summary = extract_subset(ds, args.n, args.seed)
+            summary = extract_subset(ds, args.n, pick_seed(args.seed, ds, cfg))
             if summary is None:
                 results.append({"dataset": name, "error": "extraction failed"})
                 continue

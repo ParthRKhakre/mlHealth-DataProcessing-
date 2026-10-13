@@ -58,6 +58,14 @@ def has_kaggle_credentials():
     )
 
 
+def pick_seed(cli_seed, ds, cfg):
+    """Which seed to use for one dataset: --seed on the command line wins,
+    then a "seed" set on that dataset in config.yaml, then defaults.seed."""
+    if cli_seed is not None:
+        return cli_seed
+    return ds.get("seed", cfg["defaults"].get("seed"))
+
+
 def is_image(path):
     """True if the path ends with one of our image extensions."""
     return path.lower().endswith(IMAGE_EXTS)

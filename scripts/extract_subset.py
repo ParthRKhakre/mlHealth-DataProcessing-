@@ -20,7 +20,7 @@ from collections import Counter, defaultdict
 from pathlib import Path, PurePosixPath
 
 from utils import (PROJECT_DIR, image_format, is_image, load_config,
-                   read_image, setup_logging)
+                   pick_seed, read_image, setup_logging)
 
 log = setup_logging()
 
@@ -249,8 +249,9 @@ def main():
     cfg = load_config()
     parser.add_argument("--n", type=int, default=cfg["defaults"]["n_subjects"],
                         help="number of subjects per dataset (default 10)")
-    parser.add_argument("--seed", type=int, default=cfg["defaults"].get("seed"),
-                        help="random seed; if omitted, the first N subjects (sorted) are used")
+    parser.add_argument("--seed", type=int, default=None,
+                        help="random seed for all datasets (overrides config.yaml); "
+                             "without it, each dataset uses its config seed or the first N")
     parser.add_argument("--only", help="process just this dataset name")
     parser.add_argument("--inspect", action="store_true",
                         help="only print the zip layout and subject count")
@@ -260,7 +261,7 @@ def main():
         if args.only and ds["name"] != args.only:
             continue
         try:
-            extract_subset(ds, args.n, args.seed, args.inspect)
+            extract_subset(ds, args.n, pick_seed(args.seed, ds, cfg), args.inspect)
         except Exception:
             log.exception(f"[{ds['name']}] failed - continuing with the next dataset")
 

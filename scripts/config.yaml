@@ -21,6 +21,7 @@
 defaults:
   n_subjects: 10          # how many subjects to extract per dataset
   seed: null              # null = take the first N (sorted); a number = random pick with that seed
+                          # (a dataset below can set its own "seed")
   download_retries: 3     # how many times to retry a failed download
 
 datasets:
@@ -49,8 +50,9 @@ datasets:
     # e.g. "person1_bacteria_1.jpeg" -> "person1"
     #      "IM-0115-0001.jpeg"       -> "IM-0115"
     #      "NORMAL2-IM-1427-0001.jpeg" -> "NORMAL2-IM-1427"
-    # NOTE: sorted IDs put all NORMAL ("IM-...") patients first; use --seed
-    #       to get a random mix of NORMAL and PNEUMONIA patients.
+    # Sorted IDs put all NORMAL ("IM-...") patients first, so this dataset
+    # uses a random (repeatable) pick to get both NORMAL and PNEUMONIA patients.
+    seed: 42
     subject_regex: '/((?:NORMAL2-)?IM-\d+|person\d+)[-_][^/]*\.jpe?g$'
     # the zip holds a second, identical copy under chest_xray/chest_xray/ - skip it
     exclude_regex: '^chest_xray/chest_xray/'
