@@ -31,6 +31,8 @@ project/
   kaggle.json            <- your API key (secret! do not share)
 ```
 
+See `HISTORY.md` for what was done so far, the decisions made, and the open items.
+
 ## Datasets used
 
 | Folder | Kaggle dataset | What it is | Subject ID comes from |
